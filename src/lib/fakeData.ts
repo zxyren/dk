@@ -1,45 +1,49 @@
-export const fakeVideos = [
+import { extractYouTubeId, youtubeThumbnail } from "./youtube";
+
+const fakeVideosData = [
   {
     id: "1",
-    youtube_id: "jNQXAC9IVRw",
+    youtube_url: "https://www.youtube.com/watch?v=jNQXAC9IVRw",
     title: "The Future of Artificial Intelligence",
     description: "A deep dive into how AI will change our world in the next 10 years.",
     category: "Artificial Intelligence",
-    thumbnail_url: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1000&auto=format&fit=crop",
     published_at: new Date().toISOString(),
     is_featured: true,
   },
   {
     id: "2",
-    youtube_id: "dQw4w9WgXcQ",
+    youtube_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     title: "Exploring the Edge of the Universe",
     description: "What lies beyond the observable universe?",
     category: "Space & Cosmos",
-    thumbnail_url: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=1000&auto=format&fit=crop",
     published_at: new Date(Date.now() - 86400000).toISOString(),
     is_featured: true,
   },
   {
     id: "3",
-    youtube_id: "M7lc1UVf-VE",
+    youtube_url: "https://www.youtube.com/watch?v=M7lc1UVf-VE",
     title: "Quantum Physics Explained",
     description: "The weird world of quantum mechanics made simple.",
     category: "Physics",
-    thumbnail_url: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1000&auto=format&fit=crop",
     published_at: new Date(Date.now() - 86400000 * 2).toISOString(),
     is_featured: true,
   },
   {
     id: "4",
-    youtube_id: "bHQqvYy5KYo",
+    youtube_url: "https://www.youtube.com/watch?v=bHQqvYy5KYo",
     title: "Brain-Computer Interfaces",
     description: "How close are we to merging with machines?",
     category: "Future Tech",
-    thumbnail_url: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop",
     published_at: new Date(Date.now() - 86400000 * 3).toISOString(),
     is_featured: false,
   }
 ];
+
+export const fakeVideos = fakeVideosData.map(v => ({
+  ...v,
+  youtube_id: extractYouTubeId(v.youtube_url) || "",
+  thumbnail_url: youtubeThumbnail(v.youtube_url, "max")
+}));
 
 export const fakeProducts = [
   {

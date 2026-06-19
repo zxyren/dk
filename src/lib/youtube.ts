@@ -21,7 +21,8 @@ export function extractYouTubeId(input: string): string | null {
   return m ? m[1] : null;
 }
 
-export function youtubeThumbnail(id: string, quality: "max" | "hq" | "mq" = "max") {
+export function youtubeThumbnail(idOrUrl: string, quality: "max" | "hq" | "mq" = "max") {
+  const id = extractYouTubeId(idOrUrl) || idOrUrl;
   const q = quality === "max" ? "maxresdefault" : quality === "hq" ? "hqdefault" : "mqdefault";
   return `https://img.youtube.com/vi/${id}/${q}.jpg`;
 }
