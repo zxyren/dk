@@ -26,7 +26,7 @@ export function VideoCard({ video, index = 0 }: { video: VideoCardData; index?: 
         href={`https://www.youtube.com/watch?v=${video.youtube_id}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="group block transition-transform hover:-translate-y-1"
+        className="group block transition-transform hover:-translate-y-1 duration-300"
       >
         {/* Thumbnail Area */}
         <div className="relative aspect-video overflow-hidden rounded-xl bg-black/10 ring-1 ring-white/10">
@@ -34,7 +34,7 @@ export function VideoCard({ video, index = 0 }: { video: VideoCardData; index?: 
             src={video.thumbnail_url ?? `https://img.youtube.com/vi/${video.youtube_id}/maxresdefault.jpg`}
             alt={video.title}
             loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="h-full w-full object-cover"
           />
           <div className="absolute inset-0 bg-black/10 transition-colors group-hover:bg-transparent" />
           
@@ -45,8 +45,8 @@ export function VideoCard({ video, index = 0 }: { video: VideoCardData; index?: 
           )}
           
           <div className="absolute inset-0 grid place-items-center opacity-0 transition-opacity group-hover:opacity-100">
-            <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/90 shadow-[0_0_30px_oklch(0.78_0.18_210/0.7)]">
-              <IconPlayerPlay className="h-5 w-5 fill-primary-foreground text-primary-foreground" />
+            <div className="grid h-12 w-12 place-items-center rounded-full bg-foreground/90">
+              <IconPlayerPlay size="20" className="fill-primary-foreground text-primary-foreground" />
             </div>
           </div>
         </div>
