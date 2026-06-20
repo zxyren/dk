@@ -48,3 +48,105 @@ export async function fetchYouTubeOEmbed(id: string): Promise<{ title: string; a
     return null;
   }
 }
+
+export interface YouTubeVideoDetails {
+  title: string;
+  author_name: string;
+  author_avatar?: string;
+  views: string;
+  duration: string;
+  time_ago: string;
+}
+
+// Convert ISO 8601 duration to "MM:SS" or "HH:MM:SS"
+function formatDuration(isoString: string) {
+  const match = isoString.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+  if (!match) return "0:00";
+  const h = (match[1] || "").replace("H", "");
+  const m = (match[2] || "").replace("M", "");
+  const s = (match[3] || "").replace("S", "");
+
+  const minutes = m ? (h ? m.padStart(2, "0") : m) : "0";
+  const seconds = s ? s.padStart(2, "0") : "00";
+
+  return h ? `${h}:${minutes}:${seconds}` : `${minutes}:${seconds}`;
+}
+
+// Convert numbers like 1200000 to "1.2M"
+function formatViews(viewCount: string) {
+  const num = parseInt(viewCount, 10);
+  if (isNaN(num)) return "0 views";
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + "M views";
+  if (num >= 1000) return (num / 1000).toFixed(0) + "K views";
+  return num.toString() + " views";
+}
+
+// Convert date to "2 months ago"
+function formatTimeAgo(dateString: string) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  
+  let interval = seconds / 31536000;
+  if (interval > 1) return Math.floor(interval) + " years ago";
+  interval = seconds / 2592000;
+  if (interval > 1) return Math.floor(interval) + " months ago";
+  interval = seconds / 86400;
+  if (interval > 1) return Math.floor(interval) + " days ago";
+  interval = seconds / 3600;
+  if (interval > 1) return Math.floor(interval) + " hours ago";
+  interval = seconds / 60;
+  if (interval > 1) return Math.floor(interval) + " minutes ago";
+  return Math.floor(seconds) + " seconds ago";
+}
+
+// Fetch fully dynamic details from YouTube Data API v3
+export async function fetchYouTubeVideoDetails(id: string, apiKey?: string): Promise<YouTubeVideoDetails | null> {
+  // If no API key is provided, we gracefully fallback to the public oEmbed API
+  // It will only give us title and author, so we mock the views and duration.
+  if (!apiKey) {
+     const oembed = await fetchYouTubeOEmbed(id);
+     if (!oembed) return null;
+     return {
+       title: oembed.title,
+       author_name: oembed.author_name,
+       views: "--- views", 
+       duration: "--:--", 
+       time_ago: "--- ago" 
+     };
+  }
+
+  try {
+    const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${id}&key=${apiKey}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!data.items || data.items.length === 0) return null;
+    
+    const item = data.items[0];
+    const channelId = item.snippet.channelId;
+    
+    // Fetch channel details to get the actual avatar
+    let author_avatar = undefined;
+    try {
+      const channelUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelId}&key=${apiKey}`;
+      const channelRes = await fetch(channelUrl);
+      const channelData = await channelRes.json();
+      if (channelData.items && channelData.items.length > 0) {
+        author_avatar = channelData.items[0].snippet.thumbnails.default.url;
+      }
+    } catch {
+      // Ignore avatar fetch errors
+    }
+
+    return {
+      title: item.snippet.title,
+      author_name: item.snippet.channelTitle,
+      author_avatar,
+      views: formatViews(item.statistics.viewCount),
+      duration: formatDuration(item.contentDetails.duration),
+      time_ago: formatTimeAgo(item.snippet.publishedAt)
+    };
+  } catch {
+    return null;
+  }
+}

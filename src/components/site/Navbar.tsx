@@ -19,14 +19,11 @@ export function Navbar() {
   const [pathname] = useLocation();
 
   return (
-    <motion.header
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5 }}
+    <header
       className="sticky top-0 z-50 w-full"
     >
       <div className="mx-auto max-w-7xl px-4 pt-4">
-        <nav className="glass-strong flex items-center justify-between rounded-2xl px-4 py-5 sm:px-6">
+        <nav className="glass-strong flex items-center justify-between rounded-xl px-4 py-5 sm:px-6">
           <Link href="/" className="group flex items-center gap-2">
             <span className="grid h-9 w-9 place-items-center rounded-xl bg-linear-to-br from-primary to-secondary shadow-[0_0_24px_oklch(0.78_0.18_210/0.5)] transition-transform group-hover:scale-105">
               <IconSparkle2 className="h-4 w-4 text-primary-foreground" />
@@ -44,18 +41,18 @@ export function Navbar() {
                   key={l.to}
                   href={l.to}
                   className={cn(
-                    "relative rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+                    "relative px-4 py-2.5 text-sm font-medium transition-colors",
                     active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {active && (
                     <motion.span
                       layoutId="nav-active"
-                      className="absolute inset-0 -z-10 rounded-lg bg-white/5 ring-1 ring-white/10"
+                      className="absolute inset-0 -z-10 rounded-full bg-white/5 ring-1 ring-white/10"
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
-                  {l.label}
+                  <p className="leading-none">{l.label}</p>
                 </Link>
               );
             })}
@@ -104,6 +101,6 @@ export function Navbar() {
           </motion.div>
         )}
       </div>
-    </motion.header>
+    </header>
   );
 }

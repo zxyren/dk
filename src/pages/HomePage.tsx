@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
-import { fakeVideos } from "@/lib/fakeData";
+import { getFakeVideos } from "@/lib/fakeData";
 import { IconArrowRight, IconAtom, IconBrain, IconCpu, IconMail, IconRocket, IconSparkle2 } from "@tabler/icons-react";
 
 const categories = [
@@ -26,7 +26,8 @@ export default function HomePage() {
   const featured = useQuery({
     queryKey: ["videos", "featured"],
     queryFn: async () => {
-      return fakeVideos.filter((v) => v.is_featured).slice(0, 3);
+      const vids = await getFakeVideos();
+      return vids.filter((v) => v.is_featured).slice(0, 3);
       /*
       const { data } = await supabase
         .from("videos")
@@ -42,7 +43,8 @@ export default function HomePage() {
   const latest = useQuery({
     queryKey: ["videos", "latest"],
     queryFn: async () => {
-      return fakeVideos.slice(0, 8);
+      const vids = await getFakeVideos();
+      return vids.slice(0, 8);
       /*
       const { data } = await supabase
         .from("videos")

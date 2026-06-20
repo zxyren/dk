@@ -1,49 +1,53 @@
-import { extractYouTubeId, youtubeThumbnail } from "./youtube";
+import { extractYouTubeId, youtubeThumbnail, fetchYouTubeVideoDetails } from "./youtube";
 
 const fakeVideosData = [
   {
     id: "1",
-    youtube_url: "https://www.youtube.com/watch?v=jNQXAC9IVRw",
-    title: "The Future of Artificial Intelligence",
-    description: "A deep dive into how AI will change our world in the next 10 years.",
+    youtube_url: "https://youtu.be/35KDnej1hlI?si=33oSNRK72n_ESm-i",
     category: "Artificial Intelligence",
-    published_at: new Date().toISOString(),
     is_featured: true,
   },
   {
     id: "2",
     youtube_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    title: "Exploring the Edge of the Universe",
-    description: "What lies beyond the observable universe?",
     category: "Space & Cosmos",
-    published_at: new Date(Date.now() - 86400000).toISOString(),
     is_featured: true,
   },
   {
     id: "3",
     youtube_url: "https://www.youtube.com/watch?v=M7lc1UVf-VE",
-    title: "Quantum Physics Explained",
-    description: "The weird world of quantum mechanics made simple.",
     category: "Physics",
-    published_at: new Date(Date.now() - 86400000 * 2).toISOString(),
     is_featured: true,
   },
   {
     id: "4",
     youtube_url: "https://www.youtube.com/watch?v=bHQqvYy5KYo",
-    title: "Brain-Computer Interfaces",
-    description: "How close are we to merging with machines?",
     category: "Future Tech",
-    published_at: new Date(Date.now() - 86400000 * 3).toISOString(),
     is_featured: false,
   }
 ];
 
-export const fakeVideos = fakeVideosData.map(v => ({
-  ...v,
-  youtube_id: extractYouTubeId(v.youtube_url) || "",
-  thumbnail_url: youtubeThumbnail(v.youtube_url, "max")
-}));
+export async function getFakeVideos() {
+  return Promise.all(
+    fakeVideosData.map(async (v) => {
+      const youtube_id = extractYouTubeId(v.youtube_url) || "";
+      const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
+      const meta = await fetchYouTubeVideoDetails(youtube_id, apiKey);
+      
+      return {
+        ...v,
+        youtube_id,
+        thumbnail_url: youtubeThumbnail(v.youtube_url, "max"),
+        title: meta?.title ?? "Loading...",
+        author_name: meta?.author_name ?? "Dimension Knowledge",
+        author_avatar: meta?.author_avatar ?? undefined,
+        views: meta?.views,
+        duration: meta?.duration,
+        time_ago: meta?.time_ago,
+      };
+    })
+  );
+}
 
 export const fakeProducts = [
   {
